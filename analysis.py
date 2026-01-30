@@ -87,7 +87,7 @@ print("Lasso R2:", r2_score(y_test, y_pred_lasso))
 #model Save
 import pickle
 pickle.dump(model_lasso, open("model.pkl", "wb"))
-=======
+
 import pandas as pd 
 data = pd.read_csv('student_data.csv')
 

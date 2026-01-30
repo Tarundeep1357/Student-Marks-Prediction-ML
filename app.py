@@ -30,7 +30,7 @@ st.caption("Note: Previous Internal marks (G1 AND G2) have the highest impact on
 
 
 
-=======
+
 import streamlit as st
 import pickle
 import numpy as np
