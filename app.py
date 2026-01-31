@@ -14,7 +14,7 @@ import numpy as np
 
 model = pickle.load(open("model.pkl", "rb"))
 
-st.title("Student Performance Predictor")
+st.title("Student Marks Predictor")
 
 studytime = st.number_input("Study time (hours per day)", min_value=1, max_value=24)
 failures = st.number_input("Number of past failures", min_value=0, max_value=5)
