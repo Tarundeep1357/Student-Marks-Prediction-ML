@@ -60,7 +60,7 @@ model = load_model()
 
 # Sidebar content
 with st.sidebar:
-    st.image("generated-icon.png", width=100)
+    # st.image("generated-icon.png", width=100)
     st.title("Navigation")
     st.info("This AI model uses Lasso Regression to predict final grades based on early academic performance.")
     st.divider()
