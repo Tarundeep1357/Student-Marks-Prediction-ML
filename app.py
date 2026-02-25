@@ -4,123 +4,230 @@ import numpy as np
 import os
 import pandas as pd
 import plotly.graph_objects as go
-import streamlit.components.v1 as components
 
-# ------------------ PAGE CONFIG ------------------
+# -------------------------------------------------
+# PAGE CONFIG
+# -------------------------------------------------
 st.set_page_config(
-    page_title="AI Student Success Predictor",
-    page_icon="🎓",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="LuminaPredict",
+    page_icon="⚡",
+    layout="wide"
 )
 
-# ------------------ MODERN CSS ------------------
+# -------------------------------------------------
+# SESSION STATE
+# -------------------------------------------------
+if "started" not in st.session_state:
+    st.session_state.started = False
+
+# -------------------------------------------------
+# PREMIUM GLOBAL CSS
+# -------------------------------------------------
 st.markdown("""
 <style>
 
-/* ----------- 3D Animated Gradient Background ----------- */
+/* Background */
 .stApp {
-    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72);
-    background-size: 400% 400%;
-    animation: gradientMove 12s ease infinite;
-    overflow-x: hidden;
-}
-
-/* Gradient Animation */
-@keyframes gradientMove {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
-
-/* ----------- Glass 3D Cards ----------- */
-.card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.37),
-        inset 0 0 0 1px rgba(255,255,255,0.05);
-    transition: all 0.4s ease;
-}
-
-.card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 
-        0 20px 40px rgba(0,0,0,0.6),
-        inset 0 0 0 1px rgba(255,255,255,0.1);
-}
-
-/* ----------- Floating 3D Glow Orbs ----------- */
-.glow {
-    position: fixed;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.6;
-    z-index: -1;
-}
-
-.glow1 {
-    background: #3b82f6;
-    top: -100px;
-    left: -100px;
-    animation: float1 10s infinite alternate ease-in-out;
-}
-
-.glow2 {
-    background: #8b5cf6;
-    bottom: -100px;
-    right: -100px;
-    animation: float2 12s infinite alternate ease-in-out;
-}
-
-@keyframes float1 {
-    0% { transform: translate(0px, 0px); }
-    100% { transform: translate(80px, 100px); }
-}
-
-@keyframes float2 {
-    0% { transform: translate(0px, 0px); }
-    100% { transform: translate(-100px, -60px); }
-}
-
-/* ----------- Buttons ----------- */
-.stButton>button {
-    background: linear-gradient(135deg, #6366f1, #3b82f6);
-    border-radius: 12px;
-    height: 3em;
-    font-weight: bold;
+    background: radial-gradient(circle at 20% 30%, #0b0f1a, #06090f 60%);
     color: white;
-    border: none;
-    transition: 0.3s;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
+}
+
+/* Navbar */
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 10px 0px;
+}
+
+.logo {
+    font-size:22px;
+    font-weight:700;
+}
+
+.logo span {
+    color:#8b5cf6;
+}
+
+.nav-btn {
+    background:#1f2937;
+    padding:8px 18px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+/* Hero */
+.hero {
+    text-align:center;
+    margin-top:100px;
+    margin-bottom:120px;
+}
+
+.badge {
+    display:inline-block;
+    padding:8px 18px;
+    border-radius:20px;
+    background:rgba(139,92,246,0.15);
+    border:1px solid rgba(139,92,246,0.4);
+    font-size:14px;
+    margin-bottom:30px;
+}
+
+.gradient-text {
+    font-size:68px;
+    font-weight:800;
+    background: linear-gradient(90deg,#ffffff,#60a5fa,#a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height:1.1;
+}
+
+.subtext {
+    color:#9ca3af;
+    font-size:18px;
+    margin-top:25px;
+    max-width:750px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+/* Buttons */
+.stButton>button {
+    background: linear-gradient(90deg,#6366f1,#a855f7);
+    color:white;
+    padding:14px 32px;
+    font-size:18px;
+    border-radius:40px;
+    border:none;
+    transition:0.3s;
 }
 
 .stButton>button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #3b82f6;
+    transform:scale(1.05);
+    box-shadow:0 0 25px #8b5cf6;
 }
 
-/* ----------- Text Styling ----------- */
-h1, h2, h3 {
-    color: #f1f5f9;
+/* Cards */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(18px);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: 0.3s;
 }
 
-.stMarkdown, .stText {
-    color: #e2e8f0;
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+hr {
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ================= INPUT VISIBILITY FIX ================= */
+
+/* All labels (fix invisible G1, G2 etc.) */
+label, .stSlider label, .stNumberInput label, .stSelectSlider label {
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+}
+
+/* Slider min/max numbers */
+.stSlider span {
+    color: #cbd5e1 !important;
+}
+
+/* Number input styling */
+.stNumberInput input {
+    background-color: rgba(255,255,255,0.08) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* Remove ugly grey slider block */
+.stSlider > div > div {
+    background: transparent !important;
+}
+
+/* ================= EXTREME POLISH ================= */
+
+/* Smooth fade animation */
+.hero, .card {
+    animation: fadeUp 0.8s ease forwards;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Premium slider track glow */
+.stSlider div[data-baseweb="slider"] > div > div {
+    background: linear-gradient(90deg,#6366f1,#a855f7) !important;
+}
+
+/* Slider handle glow */
+.stSlider div[data-baseweb="slider"] span {
+    box-shadow: 0 0 15px #8b5cf6 !important;
+}
+
+/* Card hover glow upgrade */
+.card:hover {
+    box-shadow: 0 15px 50px rgba(139,92,246,0.3);
+}
+
+/* Navbar glow on hover */
+.nav-btn:hover {
+    box-shadow: 0 0 20px rgba(139,92,246,0.5);
+    cursor: pointer;
+}
+
+/* Subtle page fade-in */
+.stApp {
+    animation: pageFade 0.6s ease-in;
+}
+
+@keyframes pageFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ================= FIX PRIOR SUBJECT FAILURES INPUT ================= */
+
+div[data-testid="stNumberInput"] input {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-color: rgba(255,255,255,0.08) !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stNumberInput"] {
+    background-color: rgba(255,255,255,0.08) !important;
+    border-radius: 12px !important;
 }
 
 </style>
-
-<!-- Floating Orbs -->
-<div class="glow glow1"></div>
-<div class="glow glow2"></div>
-
 """, unsafe_allow_html=True)
 
-# ------------------ LOAD MODEL ------------------
+# -------------------------------------------------
+# LOAD MODEL
+# -------------------------------------------------
 @st.cache_resource
 def load_model():
     if os.path.exists("model.pkl"):
@@ -129,164 +236,136 @@ def load_model():
 
 model = load_model()
 
-# ------------------ SIDEBAR ------------------
-with st.sidebar:
-    st.title("Navigation")
-    st.info("Lasso Regression model predicting final grades.")
-    st.divider()
-    st.write("1. Enter student metrics.")
-    st.write("2. Click Analyze.")
-    st.write("3. View insights.")
-
-# ------------------ HEADER ------------------
-st.markdown("<h1 style='text-align:center;'>🎓 AI Student Success Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;color:#94a3b8;'>Interactive ML Dashboard with Explainable AI</p>", unsafe_allow_html=True)
-
 if model is None:
     st.error("Model file not found.")
     st.stop()
 
-# ------------------ INPUT SECTION ------------------
-col1, col2 = st.columns(2)
+# -------------------------------------------------
+# NAVBAR
+# -------------------------------------------------
+st.markdown("""
+<div class="navbar">
+    <div class="logo">Lumina<span>Predict</span></div>
+    <div class="nav-btn">Access System</div>
+</div>
+""", unsafe_allow_html=True)
 
-with col1:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("📊 Academic Background")
-    G1 = st.slider("First Term Grade (G1)", 0, 20, 10)
-    G2 = st.slider("Second Term Grade (G2)", 0, 20, 10)
-    st.markdown('</div>', unsafe_allow_html=True)
+# -------------------------------------------------
+# HERO SECTION
+# -------------------------------------------------
+if not st.session_state.started:
 
-with col2:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("🧠 Behavioral Metrics")
-    studytime = st.select_slider(
-        "Daily Study Commitment",
-        options=[1,2,3,4],
-        value=2,
-        format_func=lambda x: ["<2 hrs","2-5 hrs","5-10 hrs",">10 hrs"][x-1]
-    )
-    failures = st.number_input("Prior Subject Failures", 0, 5, 0)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ------------------ PREDICTION ------------------
-if st.button("🚀 Analyze Student Performance"):
-
-    X = np.array([[studytime, failures, G1, G2]])
-    prediction = model.predict(X)[0]
-    final_score = max(0, min(20, float(prediction)))
-
-    st.divider()
-    st.subheader("📈 Predictive Analysis Result")
-
-    # -------- STATUS LOGIC --------
-    if final_score >= 15:
-        status = "🌟 Distinction Expected"
-        color = "#22c55e"
-        st.balloons()
-    elif final_score >= 10:
-        status = "✅ Pass Expected"
-        color = "#3b82f6"
-    else:
-        status = "⚠️ At Risk"
-        color = "#ef4444"
-
-    # -------- METRICS --------
-    m1, m2 = st.columns(2)
-
-    with m1:
-        st.metric("Final Grade (G3)", f"{final_score:.1f} / 20")
-
-    with m2:
-        st.markdown(f"<h3 style='color:{color};'>{status}</h3>", unsafe_allow_html=True)
-
-    # -------- CIRCULAR PROGRESS --------
-    def circular_progress(value):
-        html_code = f"""
-        <div style="display:flex;justify-content:center;margin-top:20px;">
-            <div style="
-                width:200px;height:200px;
-                border-radius:50%;
-                background: conic-gradient(#3b82f6 {value*5}%, #334155 0%);
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-size:32px;
-                font-weight:bold;
-                color:white;">
-                {value:.1f}
-            </div>
+    st.markdown("""
+    <div class="hero">
+        <div class="badge">✦ Advanced Neural Prediction Engine v2.0</div>
+        <div class="gradient-text">
+            Predict Academic <br> Outcomes with AI.
         </div>
-        """
-        components.html(html_code, height=250)
+        <div class="subtext">
+            made by Tarundep Singh | Powered by Lasso Regression | Ridge Regression | Premium AI Dashboard
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    circular_progress(final_score)
+    if st.button("Initialize Prediction →"):
+        st.session_state.started = True
+        st.rerun()
 
-    # ------------------ STRATEGIC RECOMMENDATION ------------------
-    st.subheader("💡 Strategic Recommendations")
+# -------------------------------------------------
+# DASHBOARD
+# -------------------------------------------------
+else:
 
-    if final_score >= 15:
-        st.success("Maintain current performance. Consider advanced concept mastery.")
-    elif final_score >= 10:
-        st.info("Increase study time slightly and review weak modules.")
-    else:
-        st.error("Immediate academic intervention required.")
+    st.markdown("<hr>", unsafe_allow_html=True)
 
-    # ------------------ INTERACTIVE CHART ------------------
-    st.divider()
-    st.subheader("📊 Grade Progression Path")
+    col1, col2 = st.columns(2)
 
-    fig = go.Figure()
+    with col1:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("📊 Academic Background")
+        G1 = st.slider("First Term Grade (G1)", 0, 20, 10)
+        G2 = st.slider("Second Term Grade (G2)", 0, 20, 10)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    fig.add_trace(go.Bar(
-        x=["G1","G2","Predicted G3"],
-        y=[G1, G2, final_score],
-        text=[G1, G2, round(final_score,1)],
-        textposition="outside",
-    ))
+    with col2:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("🧠 Behavioral Metrics")
+        studytime = st.select_slider(
+            "Daily Study Commitment",
+            options=[1,2,3,4],
+            value=2,
+            format_func=lambda x: ["<2 hrs","2-5 hrs","5-10 hrs",">10 hrs"][x-1]
+        )
+        failures = st.number_input("Prior Subject Failures", 0, 5, 0)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    fig.update_layout(
-        template="plotly_dark",
-        height=500,
-        showlegend=False
-    )
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    st.plotly_chart(fig, use_container_width=True)
+    if st.button("🚀 Analyze Student Performance"):
 
-    # ------------------ FEATURE IMPORTANCE ------------------
-    st.divider()
-    st.subheader("🔍 Feature Importance")
+        X = np.array([[studytime, failures, G1, G2]])
+        prediction = model.predict(X)[0]
+        final_score = max(0, min(20, float(prediction)))
 
-    feature_names = ["Study Time","Failures","G1","G2"]
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.subheader("📈 Predictive Analysis Result")
 
-    importance_df = pd.DataFrame({
-        "Feature": feature_names,
-        "Importance": model.coef_
-    })
+        if final_score >= 15:
+            status = "🌟 Distinction Expected"
+            color = "#22c55e"
+            st.balloons()
+        elif final_score >= 10:
+            status = "✅ Pass Expected"
+            color = "#3b82f6"
+        else:
+            status = "⚠️ At Risk"
+            color = "#ef4444"
 
-    importance_df = importance_df.sort_values(by="Importance", key=abs)
+        m1, m2 = st.columns(2)
 
-    fig2 = go.Figure(go.Bar(
-        x=importance_df["Importance"],
-        y=importance_df["Feature"],
-        orientation='h'
-    ))
+        with m1:
+            st.metric("Final Grade (G3)", f"{final_score:.1f} / 20")
 
-    fig2.update_layout(template="plotly_dark", height=400)
+        with m2:
+            st.markdown(f"<h3 style='color:{color};'>{status}</h3>", unsafe_allow_html=True)
 
-    st.plotly_chart(fig2, use_container_width=True)
+        # Chart
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=["G1","G2","Predicted G3"],
+            y=[G1, G2, final_score],
+            text=[G1, G2, round(final_score,1)],
+            textposition="outside",
+        ))
+        fig.update_layout(template="plotly_dark", height=500)
+        st.plotly_chart(fig, use_container_width=True)
 
-    # ------------------ WHY THIS PREDICTION ------------------
-    st.divider()
-    st.subheader("🧠 Why This Prediction?")
+        # Feature Importance
+        st.subheader("🔍 Feature Importance")
 
-    if G2 > 15:
-        st.success("Strong second term performance boosted prediction.")
-    if studytime >= 3:
-        st.info("High study commitment positively impacted score.")
-    if failures == 0:
-        st.success("No past failures significantly improved final outcome.")
-    if failures >= 2:
-        st.warning("Past failures negatively influenced prediction.")
+        importance_df = pd.DataFrame({
+            "Feature": ["Study Time","Failures","G1","G2"],
+            "Importance": model.coef_
+        }).sort_values("Importance")
 
-st.divider()
-st.caption("Powered by Lasso Regression | Interactive Explainable AI Dashboard")
+        fig2 = go.Figure(go.Bar(
+            x=importance_df["Importance"],
+            y=importance_df["Feature"],
+            orientation='h'
+        ))
+
+        fig2.update_layout(template="plotly_dark", height=400)
+        st.plotly_chart(fig2, use_container_width=True)
+
+        st.success("Prediction analysis complete.")
+
+    
+    if st.button("⬅ Back to Home"):
+        st.session_state.started = False
+        st.rerun()
+
+# -------------------------------------------------
+# FOOTER
+# -------------------------------------------------
+st.markdown("<hr>", unsafe_allow_html=True)
+st.caption("Powered by Lasso Regression | Premium AI Dashboard")
