@@ -245,7 +245,7 @@ if model is None:
 # -------------------------------------------------
 st.markdown("""
 <div class="navbar">
-    <div class="logo">Lumina<span>Predict</span></div>
+    <div class="logo">Intellex<span>Predict</span></div>
     <div class="nav-btn">Access System</div>
 </div>
 """, unsafe_allow_html=True)
