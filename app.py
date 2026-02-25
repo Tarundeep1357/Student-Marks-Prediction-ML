@@ -3,10 +3,10 @@ import pickle
 import numpy as np
 import os
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.graph_objects as go
+import streamlit.components.v1 as components
 
-# Page configuration for a professional look
+# ------------------ PAGE CONFIG ------------------
 st.set_page_config(
     page_title="AI Student Success Predictor",
     page_icon="🎓",
@@ -14,42 +14,113 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for "MAX Level" UI/UX
+# ------------------ MODERN CSS ------------------
 st.markdown("""
 <style>
-    .main {
-        background-color: #f8f9fa;
-    }
-    .stButton>button {
-        width: 100%;
-        border-radius: 10px;
-        height: 3em;
-        background-color: #4CAF50;
-        color: white;
-        font-weight: bold;
-        border: none;
-        transition: 0.3s;
-    }
-    .stButton>button:hover {
-        background-color: #45a049;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .metric-card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        border: 1px solid #eee;
-    }
-    .prediction-header {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        color: #1e293b;
-        text-align: center;
-        padding: 20px 0;
-    }
+
+/* ----------- 3D Animated Gradient Background ----------- */
+.stApp {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    overflow-x: hidden;
+}
+
+/* Gradient Animation */
+@keyframes gradientMove {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+/* ----------- Glass 3D Cards ----------- */
+.card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.37),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+    transition: all 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(0,0,0,0.6),
+        inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+/* ----------- Floating 3D Glow Orbs ----------- */
+.glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.6;
+    z-index: -1;
+}
+
+.glow1 {
+    background: #3b82f6;
+    top: -100px;
+    left: -100px;
+    animation: float1 10s infinite alternate ease-in-out;
+}
+
+.glow2 {
+    background: #8b5cf6;
+    bottom: -100px;
+    right: -100px;
+    animation: float2 12s infinite alternate ease-in-out;
+}
+
+@keyframes float1 {
+    0% { transform: translate(0px, 0px); }
+    100% { transform: translate(80px, 100px); }
+}
+
+@keyframes float2 {
+    0% { transform: translate(0px, 0px); }
+    100% { transform: translate(-100px, -60px); }
+}
+
+/* ----------- Buttons ----------- */
+.stButton>button {
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    border-radius: 12px;
+    height: 3em;
+    font-weight: bold;
+    color: white;
+    border: none;
+    transition: 0.3s;
+}
+
+.stButton>button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #3b82f6;
+}
+
+/* ----------- Text Styling ----------- */
+h1, h2, h3 {
+    color: #f1f5f9;
+}
+
+.stMarkdown, .stText {
+    color: #e2e8f0;
+}
+
 </style>
+
+<!-- Floating Orbs -->
+<div class="glow glow1"></div>
+<div class="glow glow2"></div>
+
 """, unsafe_allow_html=True)
 
+# ------------------ LOAD MODEL ------------------
 @st.cache_resource
 def load_model():
     if os.path.exists("model.pkl"):
@@ -58,108 +129,164 @@ def load_model():
 
 model = load_model()
 
-# Sidebar content
+# ------------------ SIDEBAR ------------------
 with st.sidebar:
-    # st.image("generated-icon.png", width=100)
     st.title("Navigation")
-    st.info("This AI model uses Lasso Regression to predict final grades based on early academic performance.")
+    st.info("Lasso Regression model predicting final grades.")
     st.divider()
-    st.subheader("How to use")
-    st.write("1. Enter student metrics in the main panel.")
-    st.write("2. Click 'Analyze & Predict'.")
-    st.write("3. View detailed insights and recommendations.")
+    st.write("1. Enter student metrics.")
+    st.write("2. Click Analyze.")
+    st.write("3. View insights.")
 
-# Header Section
-st.markdown("<h1 class='prediction-header'>🎓 AI Student Success Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #64748b;'>Leveraging Machine Learning to optimize educational outcomes</p>", unsafe_allow_html=True)
+# ------------------ HEADER ------------------
+st.markdown("<h1 style='text-align:center;'>🎓 AI Student Success Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;color:#94a3b8;'>Interactive ML Dashboard with Explainable AI</p>", unsafe_allow_html=True)
 
 if model is None:
-    st.error("🚨 **System Offline**: Model file not found. Please run the training script (`analysis.py`) to initialize the AI.")
+    st.error("Model file not found.")
     st.stop()
 
-# Layout: 2 Columns for inputs
-col_a, col_b = st.columns([1, 1], gap="large")
+# ------------------ INPUT SECTION ------------------
+col1, col2 = st.columns(2)
 
-with col_a:
+with col1:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📊 Academic Background")
-    with st.container():
-        G1 = st.slider("First Term Grade (G1)", 0, 20, 10, help="Initial internal assessment marks (0-20 scale)")
-        G2 = st.slider("Second Term Grade (G2)", 0, 20, 10, help="Mid-term assessment marks (0-20 scale)")
+    G1 = st.slider("First Term Grade (G1)", 0, 20, 10)
+    G2 = st.slider("Second Term Grade (G2)", 0, 20, 10)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-with col_b:
+with col2:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("🧠 Behavioral Metrics")
-    with st.container():
-        studytime = st.select_slider(
-            "Daily Study Commitment",
-            options=[1, 2, 3, 4],
-            value=2,
-            format_func=lambda x: ["< 2 hrs", "2-5 hrs", "5-10 hrs", "> 10 hrs"][x-1]
-        )
-        failures = st.number_input("Prior Subject Failures", min_value=0, max_value=5, value=0, help="Number of times the student has failed subjects in the past")
+    studytime = st.select_slider(
+        "Daily Study Commitment",
+        options=[1,2,3,4],
+        value=2,
+        format_func=lambda x: ["<2 hrs","2-5 hrs","5-10 hrs",">10 hrs"][x-1]
+    )
+    failures = st.number_input("Prior Subject Failures", 0, 5, 0)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-st.divider()
-
-# Prediction Logic
+# ------------------ PREDICTION ------------------
 if st.button("🚀 Analyze Student Performance"):
-    # Prepare input
+
     X = np.array([[studytime, failures, G1, G2]])
     prediction = model.predict(X)[0]
-    
-    # Bound the result realistically
     final_score = max(0, min(20, float(prediction)))
-    
-    # Results Presentation
-    st.markdown("<h2 style='text-align: center;'>Predictive Analysis Result</h2>", unsafe_allow_html=True)
-    
-    m1, m2, m3 = st.columns(3)
-    
-    # Visual Logic
+
+    st.divider()
+    st.subheader("📈 Predictive Analysis Result")
+
+    # -------- STATUS LOGIC --------
     if final_score >= 15:
-        status = "Distinction Expected"
-        color = "green"
-        emoji = "🌟"
+        status = "🌟 Distinction Expected"
+        color = "#22c55e"
         st.balloons()
     elif final_score >= 10:
-        status = "Pass Expected"
-        color = "blue"
-        emoji = "✅"
+        status = "✅ Pass Expected"
+        color = "#3b82f6"
     else:
-        status = "At Risk"
-        color = "red"
-        emoji = "⚠️"
+        status = "⚠️ At Risk"
+        color = "#ef4444"
+
+    # -------- METRICS --------
+    m1, m2 = st.columns(2)
 
     with m1:
-        st.metric("Final Grade (G3)", f"{final_score:.1f} / 20", delta=f"{final_score - ((G1+G2)/2):.1f} vs Avg", delta_color="normal")
+        st.metric("Final Grade (G3)", f"{final_score:.1f} / 20")
+
     with m2:
-        st.write(f"<p style='color:{color}; font-size: 24px; font-weight: bold; padding-top: 15px;'>{emoji} {status}</p>", unsafe_allow_html=True)
-    with m3:
-        st.progress(final_score / 20)
+        st.markdown(f"<h3 style='color:{color};'>{status}</h3>", unsafe_allow_html=True)
 
-    # Detailed Feedback
+    # -------- CIRCULAR PROGRESS --------
+    def circular_progress(value):
+        html_code = f"""
+        <div style="display:flex;justify-content:center;margin-top:20px;">
+            <div style="
+                width:200px;height:200px;
+                border-radius:50%;
+                background: conic-gradient(#3b82f6 {value*5}%, #334155 0%);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:32px;
+                font-weight:bold;
+                color:white;">
+                {value:.1f}
+            </div>
+        </div>
+        """
+        components.html(html_code, height=250)
+
+    circular_progress(final_score)
+
+    # ------------------ STRATEGIC RECOMMENDATION ------------------
     st.subheader("💡 Strategic Recommendations")
-    if final_score >= 15:
-        st.success("Targeting Top Tier: Maintain current study habits. Consider peer-tutoring to reinforce concepts.")
-    elif final_score >= 10:
-        st.info("Steady Progress: Focus on identifying weak areas in G1/G2 modules. Increasing study time by 1 hour could boost the final score by ~10%.")
-    else:
-        st.error("Critical Intervention Required: Schedule 1-on-1 sessions. Focus heavily on fundamental concepts from G1 and G2.")
 
-    # Visualization of Input impact (Simple mock-up logic for UX)
+    if final_score >= 15:
+        st.success("Maintain current performance. Consider advanced concept mastery.")
+    elif final_score >= 10:
+        st.info("Increase study time slightly and review weak modules.")
+    else:
+        st.error("Immediate academic intervention required.")
+
+    # ------------------ INTERACTIVE CHART ------------------
     st.divider()
-    st.subheader("📈 Performance Context")
-    
-    # Creating a small dataframe for a quick plot
-    comparison_data = pd.DataFrame({
-        "Stage": ["G1", "G2", "Predicted G3"],
-        "Score": [G1, G2, final_score]
+    st.subheader("📊 Grade Progression Path")
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=["G1","G2","Predicted G3"],
+        y=[G1, G2, final_score],
+        text=[G1, G2, round(final_score,1)],
+        textposition="outside",
+    ))
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=500,
+        showlegend=False
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # ------------------ FEATURE IMPORTANCE ------------------
+    st.divider()
+    st.subheader("🔍 Feature Importance")
+
+    feature_names = ["Study Time","Failures","G1","G2"]
+
+    importance_df = pd.DataFrame({
+        "Feature": feature_names,
+        "Importance": model.coef_
     })
-    
-    fig, ax = plt.subplots(figsize=(8, 4))
-    sns.barplot(x="Stage", y="Score", data=comparison_data, palette="viridis", ax=ax)
-    ax.set_ylim(0, 20)
-    ax.set_ylabel("Marks")
-    ax.set_title("Grade Progression Path")
-    st.pyplot(fig)
+
+    importance_df = importance_df.sort_values(by="Importance", key=abs)
+
+    fig2 = go.Figure(go.Bar(
+        x=importance_df["Importance"],
+        y=importance_df["Feature"],
+        orientation='h'
+    ))
+
+    fig2.update_layout(template="plotly_dark", height=400)
+
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # ------------------ WHY THIS PREDICTION ------------------
+    st.divider()
+    st.subheader("🧠 Why This Prediction?")
+
+    if G2 > 15:
+        st.success("Strong second term performance boosted prediction.")
+    if studytime >= 3:
+        st.info("High study commitment positively impacted score.")
+    if failures == 0:
+        st.success("No past failures significantly improved final outcome.")
+    if failures >= 2:
+        st.warning("Past failures negatively influenced prediction.")
 
 st.divider()
-st.caption("Powered by Advanced Regression Analysis | Data Source: Student Performance Dataset")
+st.caption("Powered by Lasso Regression | Interactive Explainable AI Dashboard")
