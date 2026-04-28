@@ -1,4 +1,4 @@
-# Student Marks Prediction
+# Student Marks Prediction- IntellexPredict
 
 A machine learning project that predicts student final exam marks based on their academic performance and personal background factors. Built with Python, Scikit-learn, and Streamlit.
 
