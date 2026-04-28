@@ -1,11 +1,6 @@
-
-numpy
-pandas
-scikit-learn
-matplotlib
-=======
 numpy
 pandas
 scikit-learn
 matplotlib
 streamlit
+plotly
