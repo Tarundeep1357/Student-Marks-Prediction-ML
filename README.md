@@ -83,10 +83,12 @@ The application will open in your browser at `http://localhost:8501`.
 
 The models are evaluated using the following metrics:
 
-- **Mean Absolute Error (MAE)**: Average absolute difference between predicted and actual values
-- **Mean Squared Error (MSE)**: Average squared difference between predicted and actual values
-- **Root Mean Squared Error (RMSE)**: Square root of MSE
-- **R² Score**: Proportion of variance explained by the model (0-1, higher is better)
+- **Mean Absolute Error (MAE)**: 1.2916122516370625
+- **Mean Squared Error (MSE)**: 4.476088644508931
+- **Root Mean Squared Error (RMSE)**: 2.115676876205091
+- **R² Score**: 0.781707957753413
+- **Ridge R2**: 0.7818274343637807
+- **Lasso R2**: 0.787420435340249
 
 ## Project Structure
 
