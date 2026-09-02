@@ -4,6 +4,7 @@ import numpy as np
 import os
 import pandas as pd
 import plotly.graph_objects as go
+from pathlib import Path
 
 # -------------------------------------------------
 # PAGE CONFIG
@@ -230,8 +231,12 @@ div[data-testid="stNumberInput"] {
 # -------------------------------------------------
 @st.cache_resource
 def load_model():
-    if os.path.exists("model.pkl"):
-        return pickle.load(open("model.pkl", "rb"))
+    model_path = Path(__file__).parent / "model.pkl"
+
+    if model_path.exists():
+        with open(model_path, "rb") as f:
+            return pickle.load(f)
+
     return None
 
 model = load_model()
