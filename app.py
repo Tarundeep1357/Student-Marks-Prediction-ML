@@ -267,7 +267,7 @@ if not st.session_state.started:
             Predict Academic <br> Outcomes with AI.
         </div>
         <div class="subtext">
-            made by Tarundep Singh | Powered by Lasso Regression | Ridge Regression | Premium AI Dashboard
+            made by Tarundeep Singh | Powered by Lasso Regression | Ridge Regression | Premium AI Dashboard
         </div>
     </div>
     """, unsafe_allow_html=True)
